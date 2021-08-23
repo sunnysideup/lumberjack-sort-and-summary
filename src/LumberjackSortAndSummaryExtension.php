@@ -29,12 +29,18 @@ class LumberjackSortAndSummaryExtension extends Lumberjack
     // this will change the tab title
     public function getLumberJackTitle()
     {
-        $childClasses = $this->getChildClassesOtherThanSiteTree();
-
-        if (count($childClasses) === 1) {
-            return Config::inst()->get($childClasses[0], 'plural_name');
+    public function getLumberjackTitle()
+    {
+        $children = $this->getChildClassesOtherThanSiteTree();
+        $names = [];
+        if(is_array($children) && count($children)) {
+            foreach($children as $childClassName) {
+                if($childClassName !== SiteTree::class && $childClassName !== Page::class) {
+                    $names[] = Injector::inst()->get($childClassName)->i18n_plural_name();
+                }
+            }
         }
-        return parent::getLumberjackTitle();
+        return count($names) ? implode(', ', $names) : 'Child Pages';
     }
 
     private function getChildClassesOtherThanSiteTree()
